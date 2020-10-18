@@ -109,11 +109,15 @@ class ProjectInput {
     ) {
       return;
     } else {
-      [this.titleInputElement, this.descriptionInputElement, this.peopleInputElement].forEach((x) =>
-        this.clearInput(x)
-      );
+      this.cleanInputs();
       return [enteredTitle, enteredDescription, +enteredPeople];
     }
+  }
+
+  private cleanInputs() {
+    [this.titleInputElement, this.descriptionInputElement, this.peopleInputElement].forEach((x) =>
+      this.clearInput(x)
+    );
   }
 
   @Autobind
