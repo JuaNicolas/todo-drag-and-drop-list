@@ -16,19 +16,35 @@ function validate(validatableInput: Validatable) {
     isValid = isValid && !!validatableInput.value.toString().trim().length;
   }
 
-  if (validatableInput.minLength != null && typeof validatableInput.value === 'string') {
-    isValid = isValid && validatableInput.value.trim().length >= validatableInput.minLength;
+  if (
+    validatableInput.minLength != null &&
+    typeof validatableInput.value === 'string'
+  ) {
+    isValid =
+      isValid &&
+      validatableInput.value.trim().length >= validatableInput.minLength;
   }
 
-  if (validatableInput.maxLength != null && typeof validatableInput.value === 'string') {
-    isValid = isValid && validatableInput.value.trim().length <= validatableInput.maxLength;
+  if (
+    validatableInput.maxLength != null &&
+    typeof validatableInput.value === 'string'
+  ) {
+    isValid =
+      isValid &&
+      validatableInput.value.trim().length <= validatableInput.maxLength;
   }
 
-  if (validatableInput.min != null && typeof validatableInput.value === 'number') {
+  if (
+    validatableInput.min != null &&
+    typeof validatableInput.value === 'number'
+  ) {
     isValid = isValid && validatableInput.value >= validatableInput.min;
   }
 
-  if (validatableInput.max != null && typeof validatableInput.value === 'number') {
+  if (
+    validatableInput.max != null &&
+    typeof validatableInput.value === 'number'
+  ) {
     isValid = isValid && validatableInput.value <= validatableInput.max;
   }
 
@@ -64,16 +80,27 @@ class ProjectInput {
   peopleInputElement: HTMLInputElement;
 
   constructor() {
-    this.templateElement = document.getElementById('project-input')! as HTMLTemplateElement;
+    this.templateElement = document.getElementById(
+      'project-input'
+    )! as HTMLTemplateElement;
     this.hostElement = document.getElementById('app')! as HTMLDivElement;
 
-    const importedNode = document.importNode(this.templateElement.content, true);
+    const importedNode = document.importNode(
+      this.templateElement.content,
+      true
+    );
     this.form = importedNode.firstElementChild as HTMLFormElement;
     this.form.id = 'user-input';
 
-    this.titleInputElement = this.form.querySelector('#title')! as HTMLInputElement;
-    this.descriptionInputElement = this.form.querySelector('#description')! as HTMLInputElement;
-    this.peopleInputElement = this.form.querySelector('#people')! as HTMLInputElement;
+    this.titleInputElement = this.form.querySelector(
+      '#title'
+    )! as HTMLInputElement;
+    this.descriptionInputElement = this.form.querySelector(
+      '#description'
+    )! as HTMLInputElement;
+    this.peopleInputElement = this.form.querySelector(
+      '#people'
+    )! as HTMLInputElement;
 
     this.configure();
     this.attach();
@@ -115,9 +142,11 @@ class ProjectInput {
   }
 
   private cleanInputs() {
-    [this.titleInputElement, this.descriptionInputElement, this.peopleInputElement].forEach((x) =>
-      this.clearInput(x)
-    );
+    [
+      this.titleInputElement,
+      this.descriptionInputElement,
+      this.peopleInputElement,
+    ].forEach((x) => this.clearInput(x));
   }
 
   @Autobind
@@ -143,3 +172,40 @@ class ProjectInput {
 }
 
 new ProjectInput();
+
+// ProjectList
+class ProjectList {
+  templateElement: HTMLTemplateElement;
+  hostElement: HTMLDivElement;
+  section: HTMLElement;
+  constructor(private type: 'active' | 'finished') {
+    this.templateElement = document.getElementById(
+      'project-list'
+    )! as HTMLTemplateElement;
+    this.hostElement = document.getElementById('app')! as HTMLDivElement;
+
+    const importedNode = document.importNode(
+      this.templateElement.content,
+      true
+    );
+    this.section = importedNode.firstElementChild as HTMLElement;
+    this.section.id = `${this.type}-projects`;
+
+    this.attach();
+    this.renderContent();
+  }
+
+  private attach() {
+    this.hostElement.insertAdjacentElement('beforeend', this.section);
+  }
+
+  private renderContent() {
+    const listId = `${this.type}-projects-list`;
+    this.section.querySelector('ul')!.id = listId;
+    this.section.querySelector(
+      'h2'
+    )!.textContent = `${this.type.toUpperCase()} PROJECTS`;
+  }
+}
+
+new ProjectList('active');
