@@ -1,5 +1,21 @@
 // OOP Aproach
 
+function Autobind(
+  _target: any,
+  _methodName: string,
+  descriptor: PropertyDescriptor
+): PropertyDescriptor {
+  const original = descriptor.value;
+  const modified: PropertyDescriptor = {
+    configurable: true,
+    get() {
+      const boundFn = original.bind(this);
+      return boundFn;
+    },
+  };
+  return modified;
+}
+
 class ProjectInput {
   templateElement: HTMLTemplateElement;
   hostElement: HTMLDivElement;
@@ -20,14 +36,16 @@ class ProjectInput {
     this.descriptionInputElement = this.form.querySelector('#description')! as HTMLInputElement;
     this.peopleInputElement = this.form.querySelector('#people')! as HTMLInputElement;
 
-    this.attach();
     this.configure();
+    this.attach();
   }
 
+  @Autobind
   private submitHandler(event: Event) {
     event.preventDefault();
-    console.log(event);
+    console.log(this.titleInputElement.value);
   }
+  
 
   private configure() {
     this.form.addEventListener('submit', this.submitHandler);
