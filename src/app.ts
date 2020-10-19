@@ -1,5 +1,39 @@
 // OOP Aproach
 
+interface IProjectInput {
+  title: string;
+  description: string;
+  people: number;
+}
+
+interface IProject extends IProjectInput {
+  id: number;
+}
+
+class ProjectState {
+  private projects: IProject[] = [];
+  private static instance: ProjectState;
+
+  private constructor() {}
+
+  static getInstance() {
+    if (this.instance) {
+      return this.instance;
+    }
+    return new ProjectState();
+  }
+
+  public addProject(projectInput: IProjectInput) {
+    const project = {
+      id: Date.now(),
+      ...projectInput,
+    };
+    this.projects.push(project);
+  }
+}
+
+const globalProjectState = ProjectState.getInstance();
+
 interface Validatable {
   value: string | number;
   required?: boolean;
@@ -209,3 +243,4 @@ class ProjectList {
 }
 
 new ProjectList('active');
+new ProjectList('finished');
