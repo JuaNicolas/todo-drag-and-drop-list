@@ -188,7 +188,8 @@ class ProjectInput {
     event.preventDefault();
     const userInput = this.gatherUserInput();
     if (Array.isArray(userInput)) {
-      console.log(userInput);
+      const [title, description, people] = userInput;
+      globalProjectState.addProject({ title, description, people });
     }
   }
 
