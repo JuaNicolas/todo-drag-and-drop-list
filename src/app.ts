@@ -51,7 +51,7 @@ class Project {
   ) {}
 }
 
-type Listener = (items: Project[]) => void;
+type Listener<T> = (items: T[]) => void;
 
 interface IProjectInput {
   title: string;
@@ -59,12 +59,22 @@ interface IProjectInput {
   people: number;
 }
 
-class ProjectState {
-  private _listeners: Listener[] = [];
+class State<T> {
+  protected _listeners: Listener<T>[] = [];
+  constructor() {}
+
+  public addListener(listenerFn: Listener<T>) {
+    this._listeners.push(listenerFn);
+  }
+}
+
+class ProjectState extends State<Project> {
   private _projects: Project[] = [];
   private static instance: ProjectState;
 
-  private constructor() {}
+  private constructor() {
+    super();
+  }
 
   static getInstance() {
     if (this.instance) {
@@ -72,10 +82,6 @@ class ProjectState {
     }
     this.instance = new ProjectState();
     return this.instance;
-  }
-
-  public addListener(listenerFn: Listener) {
-    this._listeners.push(listenerFn);
   }
 
   public addProject({ title, description, people }: IProjectInput) {
