@@ -165,23 +165,11 @@ function Autobind(
 type gatherUser = [string, string, number] | void;
 
 class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
-  titleInputElement: HTMLInputElement;
-  descriptionInputElement: HTMLInputElement;
-  peopleInputElement: HTMLInputElement;
-
+  public titleInputElement!: HTMLInputElement;
+  public descriptionInputElement!: HTMLInputElement;
+  public peopleInputElement!: HTMLInputElement;
   constructor() {
     super('project-input', 'app', 'afterbegin', 'user-input');
-
-    this.titleInputElement = this.element.querySelector(
-      '#title'
-    )! as HTMLInputElement;
-    this.descriptionInputElement = this.element.querySelector(
-      '#description'
-    )! as HTMLInputElement;
-    this.peopleInputElement = this.element.querySelector(
-      '#people'
-    )! as HTMLInputElement;
-
     this.configure();
   }
 
@@ -241,6 +229,15 @@ class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
   }
 
   protected configure() {
+    this.titleInputElement = this.element.querySelector(
+      '#title'
+    ) as HTMLInputElement;
+    this.descriptionInputElement = this.element.querySelector(
+      '#description'
+    ) as HTMLInputElement;
+    this.peopleInputElement = this.element.querySelector(
+      '#people'
+    ) as HTMLInputElement;
     this.element.addEventListener('submit', this.submitHandler);
   }
 }
