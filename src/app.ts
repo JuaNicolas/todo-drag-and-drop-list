@@ -164,40 +164,28 @@ function Autobind(
 
 type gatherUser = [string, string, number] | void;
 
-class ProjectInput {
-  templateElement: HTMLTemplateElement;
-  hostElement: HTMLDivElement;
-  form: HTMLFormElement;
+class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
   titleInputElement: HTMLInputElement;
   descriptionInputElement: HTMLInputElement;
   peopleInputElement: HTMLInputElement;
 
   constructor() {
-    this.templateElement = document.getElementById(
-      'project-input'
-    )! as HTMLTemplateElement;
-    this.hostElement = document.getElementById('app')! as HTMLDivElement;
+    super('project-input', 'app', 'afterbegin', 'user-input');
 
-    const importedNode = document.importNode(
-      this.templateElement.content,
-      true
-    );
-    this.form = importedNode.firstElementChild as HTMLFormElement;
-    this.form.id = 'user-input';
-
-    this.titleInputElement = this.form.querySelector(
+    this.titleInputElement = this.element.querySelector(
       '#title'
     )! as HTMLInputElement;
-    this.descriptionInputElement = this.form.querySelector(
+    this.descriptionInputElement = this.element.querySelector(
       '#description'
     )! as HTMLInputElement;
-    this.peopleInputElement = this.form.querySelector(
+    this.peopleInputElement = this.element.querySelector(
       '#people'
     )! as HTMLInputElement;
 
     this.configure();
-    this.attach();
   }
+
+  protected renderContent() {}
 
   private gatherUserInput(): gatherUser {
     const enteredTitle = this.titleInputElement.value;
@@ -239,7 +227,7 @@ class ProjectInput {
       this.titleInputElement,
       this.descriptionInputElement,
       this.peopleInputElement,
-    ].forEach((x) => this.clearInput(x));
+    ].forEach((input) => (input.value = ''));
   }
 
   @Autobind
@@ -252,16 +240,8 @@ class ProjectInput {
     }
   }
 
-  private clearInput(input: HTMLInputElement) {
-    input.value = '';
-  }
-
-  private configure() {
-    this.form.addEventListener('submit', this.submitHandler);
-  }
-
-  private attach() {
-    this.hostElement.insertAdjacentElement('afterbegin', this.form);
+  protected configure() {
+    this.element.addEventListener('submit', this.submitHandler);
   }
 }
 
