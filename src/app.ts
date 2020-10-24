@@ -1,5 +1,41 @@
 // OOP Aproach
 
+//Component Base Class
+abstract class Component<T extends HTMLElement, U extends HTMLElement> {
+  protected templateElement: HTMLTemplateElement;
+  protected hostElement: T;
+  protected element: U;
+  constructor(
+    public templateID: string,
+    public hostElementID: string,
+    public insertPosition: InsertPosition,
+    public elementID?: string
+  ) {
+    this.templateElement = document.getElementById(
+      this.templateID
+    )! as HTMLTemplateElement;
+    this.hostElement = document.getElementById(this.hostElementID)! as T;
+
+    const importedNode = document.importNode(
+      this.templateElement.content,
+      true
+    );
+    this.element = importedNode.firstElementChild as U;
+    if (this.elementID) {
+      this.element.id = this.elementID;
+    }
+
+    this.attach(insertPosition);
+  }
+
+  private attach(position: InsertPosition) {
+    this.hostElement.insertAdjacentElement(position, this.element);
+  }
+
+  protected abstract configure(): void;
+  protected abstract renderContent(): void;
+}
+
 enum ProjectStatus {
   Active,
   Finished,
@@ -230,25 +266,11 @@ class ProjectInput {
 }
 
 // ProjectList
-class ProjectList {
-  templateElement: HTMLTemplateElement;
-  hostElement: HTMLDivElement;
-  section: HTMLElement;
+class ProjectList extends Component<HTMLDivElement, HTMLElement> {
   assignedProjects: Project[] = [];
 
   constructor(private type: 'active' | 'finished') {
-    this.templateElement = document.getElementById(
-      'project-list'
-    )! as HTMLTemplateElement;
-    this.hostElement = document.getElementById('app')! as HTMLDivElement;
-
-    const importedNode = document.importNode(
-      this.templateElement.content,
-      true
-    );
-    this.section = importedNode.firstElementChild as HTMLElement;
-    this.section.id = `${this.type}-projects`;
-
+    super('project-list', 'app', 'beforeend', `${type}-projects`);
     globalProjectState.addListener((projects: Project[]) => {
       const relevantProjects = projects.filter(({ status }) => {
         if (this.type === 'active') {
@@ -259,14 +281,15 @@ class ProjectList {
       this.assignedProjects = relevantProjects;
       this.renderProjects();
     });
-
-    this.attach();
     this.renderContent();
   }
 
-  private renderProjects() {
+  protected configure() {}
+
+  protected renderProjects() {
     const listId = `${this.type}-projects-list`;
     const listEl = document.getElementById(listId) as HTMLUListElement;
+    listEl.innerHTML = '';
     for (const prjItem of this.assignedProjects) {
       const listItem = document.createElement('li');
       listItem.textContent = prjItem.title;
@@ -274,14 +297,10 @@ class ProjectList {
     }
   }
 
-  private attach() {
-    this.hostElement.insertAdjacentElement('beforeend', this.section);
-  }
-
-  private renderContent() {
+  protected renderContent() {
     const listId = `${this.type}-projects-list`;
-    this.section.querySelector('ul')!.id = listId;
-    this.section.querySelector(
+    this.element.querySelector('ul')!.id = listId;
+    this.element.querySelector(
       'h2'
     )!.textContent = `${this.type.toUpperCase()} PROJECTS`;
   }
