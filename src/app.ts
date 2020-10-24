@@ -235,7 +235,6 @@ class ProjectList {
   hostElement: HTMLDivElement;
   section: HTMLElement;
   assignedProjects: Project[] = [];
-  finishedProjects: Project[] = [];
 
   constructor(private type: 'active' | 'finished') {
     this.templateElement = document.getElementById(
@@ -251,12 +250,13 @@ class ProjectList {
     this.section.id = `${this.type}-projects`;
 
     globalProjectState.addListener((projects: Project[]) => {
-      this.assignedProjects = projects.filter(
-        ({ status }) => status === ProjectStatus.Active
-      );
-      this.finishedProjects = projects.filter(
-        ({ status }) => status === ProjectStatus.Finished
-      );
+      const relevantProjects = projects.filter(({ status }) => {
+        if (this.type === 'active') {
+          return status === ProjectStatus.Active;
+        }
+        return status === ProjectStatus.Finished;
+      });
+      this.assignedProjects = relevantProjects;
       this.renderProjects();
     });
 
