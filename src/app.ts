@@ -1,18 +1,31 @@
 // OOP Aproach
 
+enum ProjectStatus {
+  Active,
+  Finished,
+}
+
+class Project {
+  constructor(
+    public id: number,
+    public title: string,
+    public description: string,
+    public people: number,
+    public status: ProjectStatus
+  ) {}
+}
+
+type Listener = (items: Project[]) => void;
+
 interface IProjectInput {
   title: string;
   description: string;
   people: number;
 }
 
-interface IProject extends IProjectInput {
-  id: number;
-}
-
 class ProjectState {
-  private _listeners: Function[] = [];
-  private _projects: IProject[] = [];
+  private _listeners: Listener[] = [];
+  private _projects: Project[] = [];
   private static instance: ProjectState;
 
   private constructor() {}
@@ -25,15 +38,18 @@ class ProjectState {
     return this.instance;
   }
 
-  public addListener(listenerFn: Function) {
+  public addListener(listenerFn: Listener) {
     this._listeners.push(listenerFn);
   }
 
-  public addProject(projectInput: IProjectInput) {
-    const project: IProject = {
-      id: Date.now(),
-      ...projectInput,
-    };
+  public addProject({ title, description, people }: IProjectInput) {
+    const project = new Project(
+      Date.now(),
+      title,
+      description,
+      people,
+      ProjectStatus.Active
+    );
     this._projects.push(project);
     for (const listenerFn of this._listeners) {
       listenerFn(this._projects.slice());
@@ -218,8 +234,8 @@ class ProjectList {
   templateElement: HTMLTemplateElement;
   hostElement: HTMLDivElement;
   section: HTMLElement;
-  assignedProjects: IProject[] = [];
-  finishedProjects: IProject[] = [];
+  assignedProjects: Project[] = [];
+  finishedProjects: Project[] = [];
 
   constructor(private type: 'active' | 'finished') {
     this.templateElement = document.getElementById(
@@ -234,8 +250,13 @@ class ProjectList {
     this.section = importedNode.firstElementChild as HTMLElement;
     this.section.id = `${this.type}-projects`;
 
-    globalProjectState.addListener((projects: IProject[]) => {
-      this.assignedProjects = projects;
+    globalProjectState.addListener((projects: Project[]) => {
+      this.assignedProjects = projects.filter(
+        ({ status }) => status === ProjectStatus.Active
+      );
+      this.finishedProjects = projects.filter(
+        ({ status }) => status === ProjectStatus.Finished
+      );
       this.renderProjects();
     });
 
