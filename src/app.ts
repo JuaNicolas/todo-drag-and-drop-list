@@ -353,8 +353,9 @@ class ProjectList
 
   @Autobind
   public dropHandler(event: DragEvent): void {
+    const ListEl = this.element.querySelector('ul')! as HTMLUListElement;
+    ListEl.classList.remove('droppable');
     const prjId = event.dataTransfer!.getData('text/plain');
-    console.log(prjId);
     globalProjectState.moveProject(
       +prjId,
       this.type === 'active' ? ProjectStatus.Active : ProjectStatus.Finished
