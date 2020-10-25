@@ -130,6 +130,15 @@ class Project {
 
 class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
   private _project: Project;
+
+  public get person(): string {
+    if (this._project.people === 1) {
+      return '1 person';
+    } else {
+      return `${this._project.people} persons`;
+    }
+  }
+
   constructor(hostId: string, project: Project) {
     super('single-project', hostId, 'beforeend', `${project.id}`);
     this._project = project;
@@ -142,7 +151,7 @@ class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
     const elementTitle = document.createElement('h2');
     elementTitle.textContent = this._project.title;
     const elementPeople = document.createElement('h3');
-    elementPeople.textContent = `${this._project.people} people assigned`;
+    elementPeople.textContent = `${this.person} assigned`;
     const elementDescription = document.createElement('p');
     elementDescription.textContent = this._project.description;
     const hostElement = document.getElementById(
