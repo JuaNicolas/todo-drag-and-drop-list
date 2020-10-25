@@ -128,6 +128,31 @@ class Project {
   ) {}
 }
 
+class ProjectItem extends Component<HTMLUListElement, HTMLLIElement> {
+  private _project: Project;
+  constructor(hostId: string, project: Project) {
+    super('single-project', hostId, 'beforeend', `${project.id}`);
+    this._project = project;
+    this.configure();
+    this.renderContent();
+  }
+
+  protected configure(): void {}
+  protected renderContent(): void {
+    const elementTitle = document.createElement('h2');
+    elementTitle.textContent = this._project.title;
+    const elementPeople = document.createElement('h3');
+    elementPeople.textContent = `${this._project.people} people assigned`;
+    const elementDescription = document.createElement('p');
+    elementDescription.textContent = this._project.description;
+    const hostElement = document.getElementById(
+      this._project.id.toString()
+    ) as HTMLLIElement;
+
+    hostElement.append(elementTitle, elementPeople, elementDescription);
+  }
+}
+
 class State<T> {
   protected _listeners: Listener<T>[] = [];
   constructor() {}
@@ -272,9 +297,7 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
     const listEl = document.getElementById(listId) as HTMLUListElement;
     listEl.innerHTML = '';
     for (const prjItem of this.assignedProjects) {
-      const listItem = document.createElement('li');
-      listItem.textContent = prjItem.title;
-      listEl.appendChild(listItem);
+      new ProjectItem(this.element.querySelector('ul')!.id, prjItem);
     }
   }
 
