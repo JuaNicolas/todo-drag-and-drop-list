@@ -1,55 +1,11 @@
 // OOP Aproach
 
-//Component Base Class
-abstract class Component<T extends HTMLElement, U extends HTMLElement> {
-  protected templateElement: HTMLTemplateElement;
-  protected hostElement: T;
-  protected element: U;
-  constructor(
-    public templateID: string,
-    public hostElementID: string,
-    public insertPosition: InsertPosition,
-    public elementID?: string
-  ) {
-    this.templateElement = document.getElementById(
-      this.templateID
-    )! as HTMLTemplateElement;
-    this.hostElement = document.getElementById(this.hostElementID)! as T;
-
-    const importedNode = document.importNode(
-      this.templateElement.content,
-      true
-    );
-    this.element = importedNode.firstElementChild as U;
-    if (this.elementID) {
-      this.element.id = this.elementID;
-    }
-
-    this.attach(insertPosition);
-  }
-
-  private attach(position: InsertPosition) {
-    this.hostElement.insertAdjacentElement(position, this.element);
-  }
-
-  protected abstract configure(): void;
-  protected abstract renderContent(): void;
-}
-
 enum ProjectStatus {
   Active,
   Finished,
 }
 
-class Project {
-  constructor(
-    public id: number,
-    public title: string,
-    public description: string,
-    public people: number,
-    public status: ProjectStatus
-  ) {}
-}
+type gatherUser = [string, string, number] | void;
 
 type Listener<T> = (items: T[]) => void;
 
@@ -58,48 +14,6 @@ interface IProjectInput {
   description: string;
   people: number;
 }
-
-class State<T> {
-  protected _listeners: Listener<T>[] = [];
-  constructor() {}
-
-  public addListener(listenerFn: Listener<T>) {
-    this._listeners.push(listenerFn);
-  }
-}
-
-class ProjectState extends State<Project> {
-  private _projects: Project[] = [];
-  private static instance: ProjectState;
-
-  private constructor() {
-    super();
-  }
-
-  static getInstance() {
-    if (this.instance) {
-      return this.instance;
-    }
-    this.instance = new ProjectState();
-    return this.instance;
-  }
-
-  public addProject({ title, description, people }: IProjectInput) {
-    const project = new Project(
-      Date.now(),
-      title,
-      description,
-      people,
-      ProjectStatus.Active
-    );
-    this._projects.push(project);
-    for (const listenerFn of this._listeners) {
-      listenerFn(this._projects.slice());
-    }
-  }
-}
-
-const globalProjectState = ProjectState.getInstance();
 
 interface Validatable {
   value: string | number;
@@ -168,7 +82,91 @@ function Autobind(
   return modified;
 }
 
-type gatherUser = [string, string, number] | void;
+//Component Base Class
+abstract class Component<T extends HTMLElement, U extends HTMLElement> {
+  protected templateElement: HTMLTemplateElement;
+  protected hostElement: T;
+  protected element: U;
+  constructor(
+    public templateID: string,
+    public hostElementID: string,
+    public insertPosition: InsertPosition,
+    public elementID?: string
+  ) {
+    this.templateElement = document.getElementById(
+      this.templateID
+    )! as HTMLTemplateElement;
+    this.hostElement = document.getElementById(this.hostElementID)! as T;
+
+    const importedNode = document.importNode(
+      this.templateElement.content,
+      true
+    );
+    this.element = importedNode.firstElementChild as U;
+    if (this.elementID) {
+      this.element.id = this.elementID;
+    }
+
+    this.attach(insertPosition);
+  }
+
+  private attach(position: InsertPosition) {
+    this.hostElement.insertAdjacentElement(position, this.element);
+  }
+
+  protected abstract configure(): void;
+  protected abstract renderContent(): void;
+}
+
+class Project {
+  constructor(
+    public id: number,
+    public title: string,
+    public description: string,
+    public people: number,
+    public status: ProjectStatus
+  ) {}
+}
+
+class State<T> {
+  protected _listeners: Listener<T>[] = [];
+  constructor() {}
+
+  public addListener(listenerFn: Listener<T>) {
+    this._listeners.push(listenerFn);
+  }
+}
+
+class ProjectState extends State<Project> {
+  private _projects: Project[] = [];
+  private static instance: ProjectState;
+
+  private constructor() {
+    super();
+  }
+
+  static getInstance() {
+    if (this.instance) {
+      return this.instance;
+    }
+    this.instance = new ProjectState();
+    return this.instance;
+  }
+
+  public addProject({ title, description, people }: IProjectInput) {
+    const project = new Project(
+      Date.now(),
+      title,
+      description,
+      people,
+      ProjectStatus.Active
+    );
+    this._projects.push(project);
+    for (const listenerFn of this._listeners) {
+      listenerFn(this._projects.slice());
+    }
+  }
+}
 
 class ProjectInput extends Component<HTMLDivElement, HTMLFormElement> {
   public titleInputElement!: HTMLInputElement;
@@ -289,6 +287,7 @@ class ProjectList extends Component<HTMLDivElement, HTMLElement> {
   }
 }
 
+const globalProjectState = ProjectState.getInstance();
 new ProjectInput();
 new ProjectList('active');
 new ProjectList('finished');
