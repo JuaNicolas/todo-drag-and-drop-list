@@ -1,7 +1,7 @@
-import { Component } from './base.js';
-import { Autobind } from '../decorators/autobind.js';
-import { globalProjectState } from '../state/project-state.js';
-import { Validatable, validate } from '../utils/validation.js';
+import { Component } from './base';
+import { Autobind } from '../decorators/autobind';
+import { globalProjectState } from '../state/project-state';
+import { Validatable, validate } from '../utils/validation';
 
 type gatherUser = [string, string, number] | void;
 
